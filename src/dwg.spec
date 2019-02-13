@@ -1078,8 +1078,8 @@ DWG_ENTITY_END
     DECODER { \
       BITCODE_RC flag = FIELD_VALUE (flag1); \
       flag &= 0xE0; /* clear the upper flag bits, and fix them: */ \
-      flag = (flag & 1) ? flag & 0x7F : flag | 0x80; /* clear bit 7 */ \
-      flag = (flag & 2) ? flag | 0x20 : flag & 0xDF; /* set bit 5 */ \
+      flag = (flag & 1) ? flag & 0x7F : flag | 0x80; /* bit 7 should be the opposite of bit 0 */ \
+      flag = (flag & 2) ? flag | 0x20 : flag & 0xDF; /* bit 5 should be the same as bit 1 */ \
       if      (_obj->flag == DWG_TYPE_DIMENSION_ALIGNED)  flag |= 1; \
       else if (_obj->flag == DWG_TYPE_DIMENSION_ANG2LN)   flag |= 2; \
       else if (_obj->flag == DWG_TYPE_DIMENSION_DIAMETER) flag |= 3; \
