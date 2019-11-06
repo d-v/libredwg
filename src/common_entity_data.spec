@@ -87,98 +87,8 @@
   // TODO:
   // group 92 proxydata_size
   // group 310 proxydata
-  // color as FIELD_ENC (DXF, ENCODE)
 
-  SINCE (R_2004) // ENC (entity color encoding)
-    {
-#if 0 /* FIXME */
-      //FIELD_CMC (color, 62,420);
-      FIELD_ENC (color,62,420); // in ODA as CMC (B)
-#else
-      BITCODE_BS flags;
-#ifdef IS_JSON
-      field_cmc (dat, "color", &ent->color);
-#else
-      FIELD_BSx (color.flag, 0);
-      flags = ent->color.flag >> 8;
-      DECODER {
-        ent->color.rgb = 0L;
-        ent->color.index = ent->color.flag & 0x1ff; // or 0xff?
-        ent->color.flag = flags;
-        LOG_HANDLE (" color.index: %d [ENC 62]\n", ent->color.index);
-      }
-      FREE {
-         flags = ent->color.flag;
-      }
-      DXF {
-        // 0: byblock
-        if (FIELD_VALUE (color.index) != 256) // not bylayer
-          FIELD_BS (color.index, 62);
-      }
-      if (flags & 0x40 && dat->version < R_2007)
-        { // r2004+ in handle stream
-          FIELD_HANDLE (color.handle, 0, 430); // DBCOLOR 1E9F74 => 1F05B9
-        }
-      if (flags & 0x20)
-        {
-          int type;
-          //BITCODE_BL alpha;
-#ifndef IS_DXF
-          FIELD_BL (color.alpha, 0);
-#endif
-          /* 0 BYLAYER, 1 BYBLOCK, 3 alpha */
-          ent->color.alpha_type = ent->color.alpha & 0xff;
-          //alpha = ent->color.alpha >> 8;
-          //LOG_HANDLE ("alpha: %06x [BL 0]\n", ent->color.alpha);
-#ifdef IS_DECODER
-          LOG_TRACE (" color.alpha_type: %d\n", ent->color.alpha_type);
-#endif
-          if (ent->color.alpha_type == 3) {
-#ifdef IS_ENCODER
-            DXF { FIELD_BL (color.alpha >> 8, 440); }
-#else
-            DXF { FIELD_BL (color.alpha, 440); }
-#endif
-            //else LOG_TRACE ("color.alpha: %d [ENC 440]\n", ent->color.alpha >> 8);
-          }
-        }
-      if (flags & 0x80 && !(flags & 0x40)) // and not a reference
-        {
-          int type = ent->color.rgb >> 24; //?
-          FIELD_BL (color.rgb, 0); //ODA bug, documented as BS
-#if defined(IS_DECODER)
-          LOG_TRACE ("color.rgb: %06x [ENC.BL 420] (%d)\n", (unsigned)ent->color.rgb,
-                    (int32_t)(ent->color.rgb & 0x00ffffff));
-#elif defined(IS_ENCODER) && defined(IS_DXF)
-          DXF { FIELD_BL (color.rgb, 420); }
-#elif defined(IS_DXF)
-          DXF { FIELD_BL (color.rgb & 0x00ffffff, 420); }
-#endif
-        }
-      /* FIXME: not with entities, only with CMC or dbcolor handle */
-      if ((flags & 0x41) == 0x41)
-        {
-          FIELD_TV (color.name, 430);
-          //ent->color.name = bit_read_TV (dat);
-          //LOG_TRACE ("color.name: %s [ENC.TV 430]\n", ent->color.name);
-        }
-      if ((flags & 0x42) == 0x42)
-        {
-          FIELD_TV (color.book_name, 430);
-          //ent->color.book_name = bit_read_TV (dat);
-          //LOG_TRACE ("color.book_name: %s [ENC.TV 430]\n", ent->color.book_name);
-        }
-#if !defined(IS_DECODER) && !defined(IS_FREE)
-      if (!(flags & 0xf0))
-        {
-          LOG_TRACE ("color.index: %u [ENC 62]\n", (unsigned)ent->color.index);
-        }
-#endif
-#endif
-#endif
-    }
-  OTHER_VERSIONS
-    FIELD_CMC (color, 62,420);
+  FIELD_ENC (color, 62, 420); // ODA BUG, documented as CMC(B)
 
   DXF {
     if (FIELD_VALUE (ltype_scale) != 1.0)
@@ -226,3 +136,4 @@
       FIELD_RC (linewt, 370);
     }
   }
+

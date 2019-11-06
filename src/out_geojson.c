@@ -284,6 +284,7 @@ static unsigned int cur_ver = 0;
 
 #define FIELD_CMC(name, dxf1, dxf2)
 #define FIELD_TIMEBLL(name, dxf)
+#define FIELD_ENC(name, dxf1, dxf2)
 
 // FIELD_VECTOR_N(name, type, size):
 // reads data of the type indicated by 'type' 'size' times and stores

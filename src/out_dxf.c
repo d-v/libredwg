@@ -507,6 +507,33 @@ dxf_print_rd (Bit_Chain *dat, BITCODE_RD value, int dxf)
         VALUE_RL (_obj->o.color.rgb & 0x00ffffff, dxf2);                      \
       }                                                                       \
   }
+#define FIELD_ENC(color, dxf1, dxf2)                                          \
+  {                                                                           \
+    if (_obj->color.index != 256)                                             \
+      {                                                                       \
+        VALUE_RS (_obj->color.index, dxf1);                                   \
+      }                                                                       \
+    if (dat->version >= R_2004)                                               \
+      {                                                                       \
+        if (dxf2 > 0 && _obj->color.rgb != 0)                                 \
+          {                                                                   \
+            VALUE_RL (_obj->color.rgb, dxf2);                                 \
+          }                                                                   \
+        if (_obj->color.name)                                                 \
+          {                                                                   \
+            VALUE_TV (_obj->color.name, 430)                                  \
+          }                                                                   \
+        else if (_obj->color.book_name)                                       \
+          {                                                                   \
+            VALUE_TV (_obj->color.book_name, 430)                             \
+          }                                                                   \
+        if (_obj->color.alpha_type != 0 || _obj->color.alpha != 0)            \
+          {                                                                   \
+            VALUE_BL (((_obj->color.alpha_type << 24) | _obj->color.alpha),   \
+                      440)                                                    \
+          }                                                                   \
+      }                                                                       \
+  }
 #define HEADER_TIMEBLL(nam, dxf)                                              \
   HEADER_9 (nam);                                                             \
   FIELD_TIMEBLL (nam, dxf)

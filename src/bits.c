@@ -2186,23 +2186,28 @@ bit_read_ENC (Bit_Chain *dat, Bit_Chain *hdl_dat, Bit_Chain *str_dat,
   color->index = bit_read_BS (dat);
   if (dat->from_version >= R_2004)
     {
-      uint16_t flag = (((uint32_t)color->index) >> 8) & 0xff;
-      color->index &= 0x1ff;
-      if (flag & 0x80)
-        color->rgb = bit_read_BL (dat); // ODA bug, documented as BS
-      if (flag & 0x40)
-        {
-          color->handle = calloc (1, sizeof (Dwg_Object_Ref));
-          bit_read_H (hdl_dat, &(color->handle->handleref)); // => DBCOLOR
-          // else defer to dwg_decode_common_entity_handle_data ()
-        }
-      if (flag & 0x20)
+      color->flag = color->index >> 8;
+      if (color->flag & 0x20)
         {
           BITCODE_BL alpha = bit_read_BL (dat);
-          color->alpha_type = alpha & 0xff; // 0, 1 or 3
-          color->alpha = alpha >> 8;
+          color->alpha_type = alpha >> 24; // 0, 1 or 3
+          color->alpha = alpha & 0xFF;
         }
-      color->flag = (uint16_t)flag;
+      if (color->flag & 0x40)
+        { /* This means that color will be found in the 'Common Entity Handle
+             Data', which comes right after the entity's own data. The handle
+             will be put in color_handle and not in color->handle. There is
+             nothing to do right now. */
+          ;
+        }
+      else if (color->flag & 0x80)
+        {
+          color->rgb = bit_read_BL (dat); // ODA bug, documented as BS
+          color->rgb &= 0xFFFFFF;
+        }
+
+      if (color->flag & (0x20 | 0x40 | 0x80))
+        color->index &= 0xFF;
     }
 }
 
@@ -2217,16 +2222,16 @@ bit_write_ENC (Bit_Chain *dat, Bit_Chain *hdl_dat, Bit_Chain *str_dat,
     {
       uint16_t flag = color->flag;
       if (flag & 0x20)
-        bit_write_BL (dat, color->alpha);
+        {
+          BITCODE_BL alpha = (color->alpha_type << 24) | color->alpha;
+          bit_write_BL (dat, alpha);
+        }
       if (!(flag & 0x40) && (flag & 0x80))
         bit_write_BL (dat, color->rgb);
-      // ?? wide?
       if ((flag & 0x41) == 0x41)
-        bit_write_T (str_dat, color->name);
+        bit_write_TV (str_dat, color->name);
       if ((flag & 0x42) == 0x42)
-        bit_write_T (str_dat, color->book_name);
-      if (flag & 0x40)
-        bit_write_H (hdl_dat, &(color->handle->handleref)); // => DBCOLOR
+        bit_write_TV (str_dat, color->book_name);
     }
 }
 

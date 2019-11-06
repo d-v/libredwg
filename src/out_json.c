@@ -563,6 +563,8 @@ field_cmc (Bit_Chain *restrict dat, const char *restrict key,
 #define FIELD_CMC(color, dxf1, dxf2) field_cmc (dat, #color, &_obj->color)
 #define SUB_FIELD_CMC(o, color, dxf1, dxf2)                                   \
   field_cmc (dat, #color, &_obj->o.color)
+#define FIELD_ENC(color, dxf1, dxf2)                                          \
+  field_cmc (dat, #color, &_obj->color)
 
 #define FIELD_TIMEBLL(nam, dxf)                                               \
   FIRSTPREFIX fprintf (dat->fh,                                               \

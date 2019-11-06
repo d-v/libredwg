@@ -289,6 +289,7 @@ static bool env_var_checked_p;
   }
 
 #define SUB_FIELD_CMC(o, nam, dxf1, dxf2) bit_write_CMC (dat, &_obj->o.nam)
+#define FIELD_ENC(nam, dxf1, dxf2) bit_write_ENC (dat, NULL, str_dat, &_obj->nam)
 
 #define LOG_TF(level, var, len)                                               \
   if (var)                                                                    \
