@@ -15,7 +15,7 @@ def(0, Data) =>
   Fields = [
      new_struct('H330', ["01000011000111101001111001001011", '4.3.1E9E4B', [], "reactors[0]", 330])
     ,new_struct('H330', ["01000011000111101001111001001011", '4.3.1E9E4B', [], "ownerhandle", 330])
-    %new_struct('_H330', ["1100000100000011", 'c.1.3', [], "ownerhandle", 330])
+    %new_struct('_H330', ["1100000100000011", '12.1.3', [], "ownerhandle", 330])
     ,new_struct('BS70', ["0100000001", '1', [], "", 70])
   ],
   Data = [S,Fields,Class,Dxf,Version,Offsets],

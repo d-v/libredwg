@@ -32,10 +32,8 @@ gcov.log
 /libredwg-*.zip
 /libredwg-*.tar.{xz,gz}
 /libredwg-*.tar.{xz,gz}.sig
-/examples/*.log
 /examples/*.svg
 /examples/*.qi
-/examples/*.pi
 /programs/*.log
 /programs/*.bmp
 /programs/*-rewrite.dwg

@@ -15,7 +15,7 @@ def(0, Data) =>
   Fields = [
      new_struct('H330', ["01000011000111101001111001001011", '4.3.1E9E4B', [], "reactors[0]", 330])
     ,new_struct('H330', ["01000011000111101001111001001011", '4.3.1E9E4B', [], "ownerhandle", 330])
-    %new_struct('_H330', ["1100000100000001", 'c.1.1', [], "ownerhandle", 330])
+    %new_struct('_H330', ["1100000100000001", '12.1.1', [], "ownerhandle", 330])
     ,new_struct('BL96', ["10", '0', [], "has_graph", 96])
     ,new_struct('BL97', ["10", '0', [], "unknown1", 97])
   ],
@@ -1201,12 +1201,12 @@ def(17, Data) =>
   go(Data).
 
 def(18, Data) =>
-  println("ACAD_EVALUATION_GRAPH: 0x21F (234) test/test-data/2000/TS1.dxf:"),
+  println("ACAD_EVALUATION_GRAPH: 0x2169 (224) test/test-data/2013/JW.dxf:"),
   Class="ACAD_EVALUATION_GRAPH",
-  Dxf="test/test-data/2000/TS1.dxf",
-  Version=2000,
-  Offsets=[208, 0, 60, 26, 0], % hdloff, strsize, commonsize, bitsize, hdlsize
-  S="010000000101000000010100000001100100100000010000000100111111111111111111111111111111110011111111111111111111111111111111001111111111111111111111111111111100111111111111111111111111111111111001100000001100000011001000000010000111101111",
+  Dxf="test/test-data/2013/JW.dxf",
+  Version=2013,
+  Offsets=[201, 0, 30, 23, 33], % hdloff, strsize, commonsize, bitsize, hdlsize
+  S="01000000010100000001010000000110010010000001000000010011111111111111111111111111111111001111111111111111111111111111111100111111111111111111111111111111110011111111111111111111111111111111100011000000011001000100001011010001",
   % name: [1] bits, [2] value, [3] poslist, [4] fieldname, [5] dxfcode
   Fields = [
      new_struct('H330', ["01100000", '6.0.0', [], "ownerhandle", 330])
@@ -1215,7 +1215,7 @@ def(18, Data) =>
     ,new_struct('BL91', ["10", '0', [], "nodeid", 91])
     ,new_struct('BL93', ["0100100000", '32', [], "edge_flags", 93])
     ,new_struct('BL95', ["0100000001", '1', [], "num_evalexpr", 95])
-    ,new_struct('H360', ["001100100000001000011110", '3.2.21E', [], "evalexpr", 360])
+    ,new_struct('H360', ["001100100010000101101000", '3.2.2168', [], "evalexpr", 360])
     ,new_struct('BL92', ["0011111111111111111111111111111111", '-1', [], "node_edge1", 92])
     ,new_struct('BL92', ["0011111111111111111111111111111111", '-1', [], "node_edge2", 92])
     ,new_struct('BL92', ["0011111111111111111111111111111111", '-1', [], "node_edge3", 92])
@@ -1224,8 +1224,208 @@ def(18, Data) =>
   Data = [S,Fields,Class,Dxf,Version,Offsets],
   go(Data).
 
+def(19, Data) =>
+  println("ACAD_EVALUATION_GRAPH: 0x2171 (224) test/test-data/2013/JW.dxf:"),
+  Class="ACAD_EVALUATION_GRAPH",
+  Dxf="test/test-data/2013/JW.dxf",
+  Version=2013,
+  Offsets=[201, 0, 30, 23, 33], % hdloff, strsize, commonsize, bitsize, hdlsize
+  S="01000000010100000001010000000110010010000001000000010011111111111111111111111111111111001111111111111111111111111111111100111111111111111111111111111111110011111111111111111111111111111111100011000000011001000100001011100001",
+  % name: [1] bits, [2] value, [3] poslist, [4] fieldname, [5] dxfcode
+  Fields = [
+     new_struct('H330', ["01100000", '6.0.0', [], "ownerhandle", 330])
+    ,new_struct('BL96', ["0100000001", '1', [], "has_graph", 96])
+    ,new_struct('BL97', ["0100000001", '1', [], "unknown1", 97])
+    ,new_struct('BL91', ["10", '0', [], "nodeid", 91])
+    ,new_struct('BL93', ["0100100000", '32', [], "edge_flags", 93])
+    ,new_struct('BL95', ["0100000001", '1', [], "num_evalexpr", 95])
+    ,new_struct('H360', ["001100100010000101110000", '3.2.2170', [], "evalexpr", 360])
+    ,new_struct('BL92', ["0011111111111111111111111111111111", '-1', [], "node_edge1", 92])
+    ,new_struct('BL92', ["0011111111111111111111111111111111", '-1', [], "node_edge2", 92])
+    ,new_struct('BL92', ["0011111111111111111111111111111111", '-1', [], "node_edge3", 92])
+    ,new_struct('BL92', ["0011111111111111111111111111111111", '-1', [], "node_edge4", 92])
+  ],
+  Data = [S,Fields,Class,Dxf,Version,Offsets],
+  go(Data).
 
-% summary: 12322/16525=74.6%
+def(20, Data) =>
+  println("ACAD_EVALUATION_GRAPH: 0x2175 (224) test/test-data/2013/JW.dxf:"),
+  Class="ACAD_EVALUATION_GRAPH",
+  Dxf="test/test-data/2013/JW.dxf",
+  Version=2013,
+  Offsets=[201, 0, 30, 23, 33], % hdloff, strsize, commonsize, bitsize, hdlsize
+  S="01000000010100000001010000000110010010000001000000010011111111111111111111111111111111001111111111111111111111111111111100111111111111111111111111111111110011111111111111111111111111111111100011000000011001000100001011101001",
+  % name: [1] bits, [2] value, [3] poslist, [4] fieldname, [5] dxfcode
+  Fields = [
+     new_struct('H330', ["01100000", '6.0.0', [], "ownerhandle", 330])
+    ,new_struct('BL96', ["0100000001", '1', [], "has_graph", 96])
+    ,new_struct('BL97', ["0100000001", '1', [], "unknown1", 97])
+    ,new_struct('BL91', ["10", '0', [], "nodeid", 91])
+    ,new_struct('BL93', ["0100100000", '32', [], "edge_flags", 93])
+    ,new_struct('BL95', ["0100000001", '1', [], "num_evalexpr", 95])
+    ,new_struct('H360', ["001100100010000101110100", '3.2.2174', [], "evalexpr", 360])
+    ,new_struct('BL92', ["0011111111111111111111111111111111", '-1', [], "node_edge1", 92])
+    ,new_struct('BL92', ["0011111111111111111111111111111111", '-1', [], "node_edge2", 92])
+    ,new_struct('BL92', ["0011111111111111111111111111111111", '-1', [], "node_edge3", 92])
+    ,new_struct('BL92', ["0011111111111111111111111111111111", '-1', [], "node_edge4", 92])
+  ],
+  Data = [S,Fields,Class,Dxf,Version,Offsets],
+  go(Data).
+
+def(21, Data) =>
+  println("ACAD_EVALUATION_GRAPH: 0x21D4 (224) test/test-data/2013/JW.dxf:"),
+  Class="ACAD_EVALUATION_GRAPH",
+  Dxf="test/test-data/2013/JW.dxf",
+  Version=2013,
+  Offsets=[201, 0, 30, 23, 33], % hdloff, strsize, commonsize, bitsize, hdlsize
+  S="01000000010100000001010000000110010010000001000000010011111111111111111111111111111111001111111111111111111111111111111100111111111111111111111111111111110011111111111111111111111111111111100011000000011001000100001110100111",
+  % name: [1] bits, [2] value, [3] poslist, [4] fieldname, [5] dxfcode
+  Fields = [
+     new_struct('H330', ["01100000", '6.0.0', [], "ownerhandle", 330])
+    ,new_struct('BL96', ["0100000001", '1', [], "has_graph", 96])
+    ,new_struct('BL97', ["0100000001", '1', [], "unknown1", 97])
+    ,new_struct('BL91', ["10", '0', [], "nodeid", 91])
+    ,new_struct('BL93', ["0100100000", '32', [], "edge_flags", 93])
+    ,new_struct('BL95', ["0100000001", '1', [], "num_evalexpr", 95])
+    ,new_struct('H360', ["001100100010000111010011", '3.2.21D3', [], "evalexpr", 360])
+    ,new_struct('BL92', ["0011111111111111111111111111111111", '-1', [], "node_edge1", 92])
+    ,new_struct('BL92', ["0011111111111111111111111111111111", '-1', [], "node_edge2", 92])
+    ,new_struct('BL92', ["0011111111111111111111111111111111", '-1', [], "node_edge3", 92])
+    ,new_struct('BL92', ["0011111111111111111111111111111111", '-1', [], "node_edge4", 92])
+  ],
+  Data = [S,Fields,Class,Dxf,Version,Offsets],
+  go(Data).
+
+def(22, Data) =>
+  println("ACAD_EVALUATION_GRAPH: 0x22C8 (224) test/test-data/2013/JW.dxf:"),
+  Class="ACAD_EVALUATION_GRAPH",
+  Dxf="test/test-data/2013/JW.dxf",
+  Version=2013,
+  Offsets=[201, 0, 30, 23, 33], % hdloff, strsize, commonsize, bitsize, hdlsize
+  S="01000000010100000001010000000110010010000001000000010011111111111111111111111111111111001111111111111111111111111111111100111111111111111111111111111111110011111111111111111111111111111111100011000000011001000100010110001111",
+  % name: [1] bits, [2] value, [3] poslist, [4] fieldname, [5] dxfcode
+  Fields = [
+     new_struct('H330', ["01100000", '6.0.0', [], "ownerhandle", 330])
+    ,new_struct('BL96', ["0100000001", '1', [], "has_graph", 96])
+    ,new_struct('BL97', ["0100000001", '1', [], "unknown1", 97])
+    ,new_struct('BL91', ["10", '0', [], "nodeid", 91])
+    ,new_struct('BL93', ["0100100000", '32', [], "edge_flags", 93])
+    ,new_struct('BL95', ["0100000001", '1', [], "num_evalexpr", 95])
+    ,new_struct('H360', ["001100100010001011000111", '3.2.22C7', [], "evalexpr", 360])
+    ,new_struct('BL92', ["0011111111111111111111111111111111", '-1', [], "node_edge1", 92])
+    ,new_struct('BL92', ["0011111111111111111111111111111111", '-1', [], "node_edge2", 92])
+    ,new_struct('BL92', ["0011111111111111111111111111111111", '-1', [], "node_edge3", 92])
+    ,new_struct('BL92', ["0011111111111111111111111111111111", '-1', [], "node_edge4", 92])
+  ],
+  Data = [S,Fields,Class,Dxf,Version,Offsets],
+  go(Data).
+
+def(23, Data) =>
+  println("ACAD_EVALUATION_GRAPH: 0x22CD (224) test/test-data/2013/JW.dxf:"),
+  Class="ACAD_EVALUATION_GRAPH",
+  Dxf="test/test-data/2013/JW.dxf",
+  Version=2013,
+  Offsets=[201, 0, 30, 23, 33], % hdloff, strsize, commonsize, bitsize, hdlsize
+  S="01000000010100000001010000000110010010000001000000010011111111111111111111111111111111001111111111111111111111111111111100111111111111111111111111111111110011111111111111111111111111111111100011000000011001000100010110011001",
+  % name: [1] bits, [2] value, [3] poslist, [4] fieldname, [5] dxfcode
+  Fields = [
+     new_struct('H330', ["01100000", '6.0.0', [], "ownerhandle", 330])
+    ,new_struct('BL96', ["0100000001", '1', [], "has_graph", 96])
+    ,new_struct('BL97', ["0100000001", '1', [], "unknown1", 97])
+    ,new_struct('BL91', ["10", '0', [], "nodeid", 91])
+    ,new_struct('BL93', ["0100100000", '32', [], "edge_flags", 93])
+    ,new_struct('BL95', ["0100000001", '1', [], "num_evalexpr", 95])
+    ,new_struct('H360', ["001100100010001011001100", '3.2.22CC', [], "evalexpr", 360])
+    ,new_struct('BL92', ["0011111111111111111111111111111111", '-1', [], "node_edge1", 92])
+    ,new_struct('BL92', ["0011111111111111111111111111111111", '-1', [], "node_edge2", 92])
+    ,new_struct('BL92', ["0011111111111111111111111111111111", '-1', [], "node_edge3", 92])
+    ,new_struct('BL92', ["0011111111111111111111111111111111", '-1', [], "node_edge4", 92])
+  ],
+  Data = [S,Fields,Class,Dxf,Version,Offsets],
+  go(Data).
+
+def(24, Data) =>
+  println("ACAD_EVALUATION_GRAPH: 0x3107 (224) test/test-data/2013/JW.dxf:"),
+  Class="ACAD_EVALUATION_GRAPH",
+  Dxf="test/test-data/2013/JW.dxf",
+  Version=2013,
+  Offsets=[201, 0, 30, 23, 33], % hdloff, strsize, commonsize, bitsize, hdlsize
+  S="01000000010100000001010000000110010010000001000000010011111111111111111111111111111111001111111111111111111111111111111100111111111111111111111111111111110011111111111111111111111111111111100011000000011001000110001000001101",
+  % name: [1] bits, [2] value, [3] poslist, [4] fieldname, [5] dxfcode
+  Fields = [
+     new_struct('H330', ["01100000", '6.0.0', [], "ownerhandle", 330])
+    ,new_struct('BL96', ["0100000001", '1', [], "has_graph", 96])
+    ,new_struct('BL97', ["0100000001", '1', [], "unknown1", 97])
+    ,new_struct('BL91', ["10", '0', [], "nodeid", 91])
+    ,new_struct('BL93', ["0100100000", '32', [], "edge_flags", 93])
+    ,new_struct('BL95', ["0100000001", '1', [], "num_evalexpr", 95])
+    ,new_struct('H360', ["001100100011000100000110", '3.2.3106', [], "evalexpr", 360])
+    ,new_struct('BL92', ["0011111111111111111111111111111111", '-1', [], "node_edge1", 92])
+    ,new_struct('BL92', ["0011111111111111111111111111111111", '-1', [], "node_edge2", 92])
+    ,new_struct('BL92', ["0011111111111111111111111111111111", '-1', [], "node_edge3", 92])
+    ,new_struct('BL92', ["0011111111111111111111111111111111", '-1', [], "node_edge4", 92])
+  ],
+  Data = [S,Fields,Class,Dxf,Version,Offsets],
+  go(Data).
+
+def(25, Data) =>
+  println("ACAD_EVALUATION_GRAPH: 0x216D (224) test/test-data/2013/JW.dxf:"),
+  Class="ACAD_EVALUATION_GRAPH",
+  Dxf="test/test-data/2013/JW.dxf",
+  Version=2013,
+  Offsets=[201, 0, 30, 23, 33], % hdloff, strsize, commonsize, bitsize, hdlsize
+  S="01000000010100000001010000000110010010000001000000010011111111111111111111111111111111001111111111111111111111111111111100111111111111111111111111111111110011111111111111111111111111111111100100000000011001000100001011011101",
+  % name: [1] bits, [2] value, [3] poslist, [4] fieldname, [5] dxfcode
+  Fields = [
+     new_struct('H330', ["10000000", '8.0.0', [], "ownerhandle", 330])
+    ,new_struct('BL96', ["0100000001", '1', [], "has_graph", 96])
+    ,new_struct('BL97', ["0100000001", '1', [], "unknown1", 97])
+    ,new_struct('BL91', ["10", '0', [], "nodeid", 91])
+    ,new_struct('BL93', ["0100100000", '32', [], "edge_flags", 93])
+    ,new_struct('BL95', ["0100000001", '1', [], "num_evalexpr", 95])
+    ,new_struct('H360', ["001100100010000101101110", '3.2.216E', [], "evalexpr", 360])
+    ,new_struct('BL92', ["0011111111111111111111111111111111", '-1', [], "node_edge1", 92])
+    ,new_struct('BL92', ["0011111111111111111111111111111111", '-1', [], "node_edge2", 92])
+    ,new_struct('BL92', ["0011111111111111111111111111111111", '-1', [], "node_edge3", 92])
+    ,new_struct('BL92', ["0011111111111111111111111111111111", '-1', [], "node_edge4", 92])
+  ],
+  Data = [S,Fields,Class,Dxf,Version,Offsets],
+  go(Data).
+
+def(26, Data) =>
+  println("ACAD_EVALUATION_GRAPH: 0x2096 (40) test/test-data/2013/JW.dxf:"),
+  Class="ACAD_EVALUATION_GRAPH",
+  Dxf="test/test-data/2013/JW.dxf",
+  Version=2013,
+  Offsets=[35, 0, 30, 6, 15], % hdloff, strsize, commonsize, bitsize, hdlsize
+  S="0100000001010000000110100011000001111111",
+  % name: [1] bits, [2] value, [3] poslist, [4] fieldname, [5] dxfcode
+  Fields = [
+     new_struct('H330', ["01100000", '6.0.0', [], "ownerhandle", 330])
+    ,new_struct('BL96', ["0100000001", '1', [], "has_graph", 96])
+    ,new_struct('BL97', ["0100000001", '1', [], "unknown1", 97])
+  ],
+  Data = [S,Fields,Class,Dxf,Version,Offsets],
+  go(Data).
+
+def(27, Data) =>
+  println("ACAD_EVALUATION_GRAPH: 0x20AE (40) test/test-data/2013/JW.dxf:"),
+  Class="ACAD_EVALUATION_GRAPH",
+  Dxf="test/test-data/2013/JW.dxf",
+  Version=2013,
+  Offsets=[35, 0, 30, 6, 15], % hdloff, strsize, commonsize, bitsize, hdlsize
+  S="0100000001010000000110100100000001111111",
+  % name: [1] bits, [2] value, [3] poslist, [4] fieldname, [5] dxfcode
+  Fields = [
+     new_struct('H330', ["10000000", '8.0.0', [], "ownerhandle", 330])
+    ,new_struct('BL96', ["0100000001", '1', [], "has_graph", 96])
+    ,new_struct('BL97', ["0100000001", '1', [], "unknown1", 97])
+  ],
+  Data = [S,Fields,Class,Dxf,Version,Offsets],
+  go(Data).
+
+
+% summary: 13596/18163=74.9%
 
 go0 ?=> def(0,Data).
 go1 ?=> def(1,Data).
@@ -1246,6 +1446,15 @@ go15 ?=> def(15,Data).
 go16 ?=> def(16,Data).
 go17 ?=> def(17,Data).
 go18 ?=> def(18,Data).
+go19 ?=> def(19,Data).
+go20 ?=> def(20,Data).
+go21 ?=> def(21,Data).
+go22 ?=> def(22,Data).
+go23 ?=> def(23,Data).
+go24 ?=> def(24,Data).
+go25 ?=> def(25,Data).
+go26 ?=> def(26,Data).
+go27 ?=> def(27,Data).
 
 main => go0,
         go1,
@@ -1265,4 +1474,13 @@ main => go0,
         go15,
         go16,
         go17,
-        go18.
+        go18,
+        go19,
+        go20,
+        go21,
+        go22,
+        go23,
+        go24,
+        go25,
+        go26,
+        go27.
