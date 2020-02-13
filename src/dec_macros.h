@@ -702,8 +702,8 @@
           LOG_TRACE (#color ".rgb: 0x%06x [ENC.BL %d]\n",                     \
                      (unsigned)_obj->color.rgb, dxf2);                        \
         if (_obj->color.flag & 0x40 && _obj->color.handle)                    \
-          LOG_TRACE (#color ".handle: %X [ENC.H %d]\n",                       \
-                     _obj->color.handle->handleref.value, dxf2 + 10);         \
+          LOG_TRACE (#color ".handle: " FORMAT_REF " [ENC.H %d]\n",           \
+                     ARGS_REF (_obj->color.handle), dxf2 + 10);               \
       }                                                                       \
   }
 #define SUB_FIELD_ENC(o, color, dxf1, dxf2)                                   \
@@ -715,14 +715,14 @@
         if (_obj->o.color.flag)                                               \
           LOG_TRACE (#o "." #color ".flag: 0x%x\n", (unsigned)_obj->o.color.flag);   \
         if (_obj->o.color.flag & 0x20)                                        \
-          LOG_TRACE (#o "." #color ".alpha: %d [ENC.BL %d]\n",                       \
+          LOG_TRACE (#o "." #color ".alpha: %d [ENC.BL %d]\n",                \
                      (unsigned)_obj->o.color.alpha, dxf2 + 20);               \
         if (_obj->o.color.flag & 0x80)                                        \
-          LOG_TRACE (#o "." #color ".rgb: 0x%06x [ENC.BL %d]\n",                     \
+          LOG_TRACE (#o "." #color ".rgb: 0x%06x [ENC.BL %d]\n",              \
                      (unsigned)_obj->o.color.rgb, dxf2);                      \
         if (_obj->o.color.flag & 0x40 && _obj->o.color.handle)                \
-          LOG_TRACE (#o "." #color ".handle: %lX [ENC.H %d]\n",               \
-                     _obj->o.color.handle->handleref.value, dxf2 + 10);       \
+          LOG_TRACE (#o "." #color ".handle: " FORMAT_REF " [ENC.H %d]\n",    \
+                     ARGS_REF (_obj->o.color.handle), dxf2 + 10);             \
       }                                                                       \
   }
 
