@@ -324,7 +324,7 @@ json_string (Bit_Chain *restrict dat, jsmntokens_t *restrict tokens)
   if (memchr (&dat->chain[t->start], '\\', len))
     {
       len += 8;
-      key = malloc (len);
+      key = (char*)malloc (len);
       dat->chain[t->end] = '\0';
       while (!bit_utf8_to_TV (key, &dat->chain[t->start], len))
         {
@@ -337,13 +337,13 @@ json_string (Bit_Chain *restrict dat, jsmntokens_t *restrict tokens)
               len = t->end - t->start;
               goto normal;
             }
-          key = realloc (key, len);
+          key = (char *)realloc (key, len);
         }
     }
   else
     {
     normal:
-      key = malloc (len + 1);
+      key = (char *)malloc (len + 1);
       memcpy (key, &dat->chain[t->start], len);
       key[len] = '\0';
     }
@@ -377,7 +377,7 @@ json_binary (Bit_Chain *restrict dat, jsmntokens_t *restrict tokens,
   char *str = json_string (dat, tokens);
   size_t len = strlen (str);
   unsigned long blen = len / 2;
-  char *buf = len ? malloc (blen + 1) : NULL;
+  char *buf = len ? (char *)malloc (blen + 1) : NULL;
   char *pos = str;
   char *old;
 
@@ -654,7 +654,7 @@ json_FILEHEADER (Bit_Chain *restrict dat, Dwg_Data *restrict dwg,
 {
   const char *section = "FILEHEADER";
   const jsmntok_t *t = &tokens->tokens[tokens->index];
-  struct Dwg_Header *_obj = &dwg->header;
+  Dwg_Header *_obj = &dwg->header;
   Dwg_Object *obj = NULL;
   char version[80];
   int size = t->size;
@@ -895,10 +895,10 @@ json_CLASSES (Bit_Chain *restrict dat, Dwg_Data *restrict dwg,
              tokens->index, size);
   tokens->index++;
   if (dwg->num_classes == 0)
-    dwg->dwg_class = calloc (size, sizeof (Dwg_Class));
+    dwg->dwg_class = (Dwg_Class *)calloc (size, sizeof (Dwg_Class));
   else
-    dwg->dwg_class = realloc (dwg->dwg_class,
-                              (dwg->num_classes + size) * sizeof (Dwg_Class));
+    dwg->dwg_class = (Dwg_Class *)realloc (
+        dwg->dwg_class, (dwg->num_classes + size) * sizeof (Dwg_Class));
   if (!dwg->dwg_class)
     {
       LOG_ERROR ("Out of memory");
@@ -1040,7 +1040,7 @@ json_eed (Bit_Chain *restrict dat, Dwg_Data *restrict dwg,
   const jsmntok_t *t = &tokens->tokens[tokens->index];
   int isize = -1;
   long size = 0;
-  obj->eed = calloc (t->size, sizeof (Dwg_Eed));
+  obj->eed = (Dwg_Eed *)calloc (t->size, sizeof (Dwg_Eed));
   obj->num_eed = t->size;
   LOG_TRACE ("num_eed: " FORMAT_BL" [BL]\n", obj->num_eed);
   tokens->index++; // array of objects
@@ -1065,7 +1065,7 @@ json_eed (Bit_Chain *restrict dat, Dwg_Data *restrict dwg,
                   // see below: if does_cross_unicode_datversion (dat) we need to recalc
                   obj->eed[i].size = (BITCODE_BS)size;
                   have = size + 1; // we overallocate by 1 for the ending NUL
-                  obj->eed[i].data = calloc (have, 1);
+                  obj->eed[i].data = (Dwg_Eed_Data *)calloc (have, 1);
                   LOG_INSANE (" alloc eed[%u].data: %d\n", i, have)
                }
               else if (strEQc (key, "handle"))
@@ -1085,11 +1085,11 @@ json_eed (Bit_Chain *restrict dat, Dwg_Data *restrict dwg,
                     {
                       if (have > 0)
                         {
-                          obj->eed[i - 1].data = realloc (obj->eed[i - 1].data, size - have);
+                          obj->eed[i - 1].data = (Dwg_Eed_Data *)realloc (obj->eed[i - 1].data, size - have);
                           LOG_INSANE (" realloc eed[%u].data: %d\n", i-1, (int)(size - have))
                         }
                       have = size - have - 1;
-                      obj->eed[i].data = calloc (have, 1);
+                      obj->eed[i].data = (Dwg_Eed_Data *)calloc (have, 1);
                       LOG_INSANE (" alloc eed[%u].data: %d\n", i, have)
                     }
                   have--;
@@ -1346,7 +1346,7 @@ find_numfield (const Dwg_DYNAPI_field *restrict fields,
                const char *restrict key)
 {
   const Dwg_DYNAPI_field *f;
-  char *s = malloc (strlen (key) + 12);
+  char *s = (char*)malloc (strlen (key) + 12);
   strcpy (s, "num_");
   strcat (s, key);
   // see gen-dynapi.pl:1102
@@ -1378,7 +1378,7 @@ find_numfield (const Dwg_DYNAPI_field *restrict fields,
     strcpy (s, "num_dashes");
   else if (strEQc (key, "segs") || strEQc (key, "polyline_paths"))
     {
-      s = realloc (s, strlen ("num_segs_or_paths") + 1);
+      s = (char *)realloc (s, strlen ("num_segs_or_paths") + 1);
       strcpy (s, "num_segs_or_paths");
     }
   else if (strEQc (key, "txt.col_sizes"))
@@ -1397,7 +1397,7 @@ search:
   // there are two of them
   if (strEQc (key, "paths") && strNE (s, "num_segs_or_paths"))
     {
-      s = realloc (s, strlen ("num_segs_or_paths") + 1);
+      s = (char *)realloc (s, strlen ("num_segs_or_paths") + 1);
       strcpy (s, "num_segs_or_paths");
       goto search;
     }
@@ -1410,7 +1410,7 @@ find_sizefield (const Dwg_DYNAPI_field *restrict fields,
                 const char *restrict key)
 {
   const Dwg_DYNAPI_field *f;
-  char *s = malloc (strlen (key) + 12);
+  char *s = (char *)malloc (strlen (key) + 12);
   strcpy (s, key);
   strcat (s, "_size");
   for (f = &fields[0]; f->name; f++)
@@ -1583,7 +1583,7 @@ _set_struct_field (Bit_Chain *restrict dat, const Dwg_Object *restrict obj,
                 {
                   // convert from hex
                   unsigned blen = len / 2;
-                  char *buf = len ? malloc (blen + 1) : NULL;
+                  char *buf = len ? (char*)malloc (blen + 1) : NULL;
                   char *pos = str;
                   char *old;
                   for (unsigned i = 0; i < blen; i++)
@@ -1618,13 +1618,13 @@ _set_struct_field (Bit_Chain *restrict dat, const Dwg_Object *restrict obj,
                         }
                       else if (len != (size_t)k)
                         {
-                          str = realloc (str, k);
+                          str = (char*)realloc (str, k);
                           memset (&str[len + 1], 0, k - len - 1);
                         }
                     }
                   else if (f->size > sizeof (char *))
                     {
-                      str = realloc (str, f->size);
+                      str = (char*)realloc (str, f->size);
                       memset (&str[len + 1], 0, f->size - len - 1);
                     }
                   LOG_TRACE ("%s: \"%s\" [%s %d]\n", key, str, f->type,
@@ -1700,7 +1700,7 @@ _set_struct_field (Bit_Chain *restrict dat, const Dwg_Object *restrict obj,
                       size1 = numitems;
                     }
                 }
-              hdls = size1 ? calloc (size1, sizeof (BITCODE_H)) : NULL;
+              hdls = size1 ? (BITCODE_H *)calloc (size1, sizeof (BITCODE_H)) : NULL;
               json_set_numfield (_obj, fields, key, (long)size1);
               tokens->index++;
               for (int k = 0; k < t->size; k++)
@@ -1742,7 +1742,7 @@ _set_struct_field (Bit_Chain *restrict dat, const Dwg_Object *restrict obj,
                   else
                     size1 = t->size;
                 }
-              elems = size1 ? calloc (size1, sizeof (BITCODE_TV)) : NULL;
+              elems = size1 ? (BITCODE_TV *)calloc (size1, sizeof (BITCODE_TV)) : NULL;
               json_set_numfield (_obj, fields, key, (long)size1);
               tokens->index++;
               for (int k = 0; k < t->size; k++)
@@ -1769,7 +1769,9 @@ _set_struct_field (Bit_Chain *restrict dat, const Dwg_Object *restrict obj,
           else if (t->type == JSMN_ARRAY && strEQc (f->type, "3DPOINT*"))
             {
               int size1 = t->size;
-              BITCODE_3DPOINT *pts = size1 ? calloc (size1, sizeof (BITCODE_3BD)) : NULL;
+              BITCODE_3DPOINT *pts
+                  = size1 ? (BITCODE_3BD *)calloc (size1, sizeof (BITCODE_3BD))
+                          : NULL;
               json_set_numfield (_obj, fields, key, size1);
               tokens->index++;
               for (int k = 0; k < size1; k++)
@@ -1784,7 +1786,9 @@ _set_struct_field (Bit_Chain *restrict dat, const Dwg_Object *restrict obj,
           else if (t->type == JSMN_ARRAY && strEQc (f->type, "2RD*"))
             {
               int size1 = t->size;
-              BITCODE_2DPOINT *pts = size1 ? calloc (size1, sizeof (BITCODE_2RD)) : NULL;
+              BITCODE_2DPOINT *pts = size1 ? (BITCODE_2DPOINT *)calloc (
+                                         size1, sizeof (BITCODE_2DPOINT))
+                                           : NULL;
               json_set_numfield (_obj, fields, key, size1);
               tokens->index++;
               for (int k = 0; k < size1; k++)
@@ -1799,7 +1803,7 @@ _set_struct_field (Bit_Chain *restrict dat, const Dwg_Object *restrict obj,
           else if (t->type == JSMN_ARRAY && strEQc (f->type, "BD*"))
             {
               int size1 = t->size;
-              BITCODE_BD *nums = size1 ? calloc (size1, sizeof (BITCODE_BD)) : NULL;
+              BITCODE_BD *nums = size1 ? (BITCODE_BD *)calloc (size1, sizeof (BITCODE_BD)) : NULL;
               json_set_numfield (_obj, fields, key, size1);
               tokens->index++;
               for (int k = 0; k < size1; k++)
@@ -1815,7 +1819,7 @@ _set_struct_field (Bit_Chain *restrict dat, const Dwg_Object *restrict obj,
           else if (t->type == JSMN_ARRAY && strEQc (f->type, "BL*"))
             {
               int size1 = t->size;
-              BITCODE_BL *nums = size1 ? calloc (size1, sizeof (BITCODE_BL)) : NULL;
+              BITCODE_BL *nums = size1 ? (BITCODE_BL *)calloc (size1, sizeof (BITCODE_BL)) : NULL;
               json_set_numfield (_obj, fields, key, size1);
               tokens->index++;
               for (int k = 0; k < size1; k++)
@@ -1830,7 +1834,7 @@ _set_struct_field (Bit_Chain *restrict dat, const Dwg_Object *restrict obj,
             }
           else if (t->type == JSMN_ARRAY && strEQc (key, "xdata") && strEQc (name, "XRECORD"))
             {
-              error |= json_xdata (dat, dwg, tokens, _obj);
+              error |= json_xdata (dat, dwg, tokens, (Dwg_Object_XRECORD *)_obj);
             }
           // subclass arrays:
           else if (t->type == JSMN_ARRAY && memBEGINc (f->type, "Dwg_"))
@@ -1866,11 +1870,11 @@ _set_struct_field (Bit_Chain *restrict dat, const Dwg_Object *restrict obj,
                 }
               if (strEQc (subclass, "DIMASSOC_Ref") && num_elems != 4)
                 {
-                  elems = calloc (MAX (4, num_elems), size_elem);
+                  elems = (char*)calloc (MAX (4, num_elems), size_elem);
                   LOG_TRACE ("DIMASSOC num_refs = 4\n");
                 }
               else
-                elems = num_elems ? calloc (num_elems, size_elem) : NULL;
+                elems = num_elems ? (char*)calloc (num_elems, size_elem) : NULL;
               tokens->index++;
               // array of structs
               if (!num_elems)
@@ -2102,10 +2106,10 @@ json_OBJECTS (Bit_Chain *restrict dat, Dwg_Data *restrict dwg,
              tokens->index, size);
   tokens->index++;
   if (dwg->num_objects == 0)
-    dwg->object = calloc (size, sizeof (Dwg_Object));
+    dwg->object = (Dwg_Object*)calloc (size, sizeof (Dwg_Object));
   else
     {
-      dwg->object = realloc (dwg->object,
+      dwg->object = (Dwg_Object*)realloc (dwg->object,
                              (dwg->num_objects + size) * sizeof (Dwg_Object));
       memset (&dwg->object[dwg->num_objects], 0, size);
     }
@@ -2227,12 +2231,12 @@ json_OBJECTS (Bit_Chain *restrict dat, Dwg_Data *restrict dwg,
                 }
               LOG_TRACE ("\nnew object %s [%d] (size: %d)\n", name, i,
                          objsize);
-              obj->tio.object = calloc (1, sizeof (Dwg_Object_Object));
+              obj->tio.object = (Dwg_Object_Object*)calloc (1, sizeof (Dwg_Object_Object));
               obj->tio.object->dwg = dwg;
               obj->tio.object->objid = i;
               // NEW_OBJECT (dwg, obj)
               // ADD_OBJECT loop?
-              _obj = calloc (1, objsize);
+              _obj = (Dwg_Object_APPID*)calloc (1, objsize);
               obj->tio.object->tio.APPID = _obj;
               obj->tio.object->tio.APPID->parent = obj->tio.object;
               obj->name = strdup (name);
@@ -2286,12 +2290,12 @@ json_OBJECTS (Bit_Chain *restrict dat, Dwg_Data *restrict dwg,
                 }
               LOG_TRACE ("\nnew entity %s [%d] (size: %d)\n", name, i,
                          objsize);
-              obj->tio.entity = calloc (1, sizeof (Dwg_Object_Entity));
+              obj->tio.entity = (Dwg_Object_Entity *)calloc (1, sizeof (Dwg_Object_Entity));
               obj->tio.entity->dwg = dwg;
               obj->tio.entity->objid = i;
               // NEW_ENTITY (dwg, obj)
               // ADD_ENTITY loop?
-              _obj = calloc (1, objsize);
+              _obj = (Dwg_Object_APPID *)calloc (1, objsize);
               obj->tio.entity->tio.POINT = (Dwg_Entity_POINT *)_obj;
               obj->tio.entity->tio.POINT->parent = obj->tio.entity;
               obj->name = strdup (name);
@@ -2419,7 +2423,7 @@ json_OBJECTS (Bit_Chain *restrict dat, Dwg_Data *restrict dwg,
               int len = t->end - t->start;
               char *hex = json_string (dat, tokens);
               unsigned blen = len / 2;
-              BITCODE_TF buf = malloc (blen + 1);
+              BITCODE_TF buf = (BITCODE_TF)malloc (blen + 1);
               char *pos = hex;
               char *old;
               for (unsigned k = 0; k < blen; k++)
@@ -2466,18 +2470,30 @@ json_OBJECTS (Bit_Chain *restrict dat, Dwg_Data *restrict dwg,
               if (strEQc (name, "MULTILEADER"))
                 {
                   // embedded structs
-                  if (memBEGINc (key, "ctx.content.txt.")
-                      || memBEGINc (key, "ctx.content.blk."))
+                  if (memBEGINc (key, "ctx.content.txt."))
                     {
                       Dwg_Entity_MULTILEADER *_o
                           = (Dwg_Entity_MULTILEADER *)_obj;
                       Dwg_MLEADER_Content *cnt = &_o->ctx.content;
                       const Dwg_DYNAPI_field *sf
-                          = dwg_dynapi_subclass_fields ("MLEADER_Content");
+                          = dwg_dynapi_subclass_fields ("MLEADER_Content_MText");
                       if (sf
                           && _set_struct_field (
                               dat, obj, tokens, cnt, "MLEADER",
-                              &key[strlen ("ctx.content.")], sf))
+                              &key[strlen ("ctx.content.txt.")], sf))
+                        continue;
+                    }
+                  else if (memBEGINc (key, "ctx.content.blk."))
+                    {
+                      Dwg_Entity_MULTILEADER *_o
+                          = (Dwg_Entity_MULTILEADER *)_obj;
+                      Dwg_MLEADER_Content *cnt = &_o->ctx.content;
+                      const Dwg_DYNAPI_field *sf
+                          = dwg_dynapi_subclass_fields ("MLEADER_Content_Block");
+                      if (sf
+                          && _set_struct_field (
+                              dat, obj, tokens, cnt, "MLEADER",
+                              &key[strlen ("ctx.content.blk.")], sf))
                         continue;
                     }
                   else if (memBEGINc (key, "ctx."))
@@ -2624,7 +2640,7 @@ json_R2004_Header (Bit_Chain *restrict dat, Dwg_Data *restrict dwg,
 {
   const char *section = "R2004_Header";
   const jsmntok_t *t = &tokens->tokens[tokens->index];
-  struct Dwg_R2004_Header *_obj = &dwg->r2004_header;
+  Dwg_R2004_Header *_obj = &dwg->r2004_header;
   int size;
   if (t->type != JSMN_OBJECT)
     {
@@ -2702,7 +2718,7 @@ json_AuxHeader (Bit_Chain *restrict dat, Dwg_Data *restrict dwg,
 {
   const char *section = "AuxHeader";
   const jsmntok_t *t = &tokens->tokens[tokens->index];
-  struct Dwg_AuxHeader *_obj = &dwg->auxheader;
+  Dwg_AuxHeader *_obj = &dwg->auxheader;
   int size;
   if (t->type != JSMN_OBJECT)
     {
@@ -2773,7 +2789,7 @@ json_SummaryInfo (Bit_Chain *restrict dat, Dwg_Data *restrict dwg,
 {
   const char *section = "SummaryInfo";
   const jsmntok_t *t = &tokens->tokens[tokens->index];
-  struct Dwg_SummaryInfo *_obj = &dwg->summaryinfo;
+  Dwg_SummaryInfo *_obj = &dwg->summaryinfo;
   int size;
   if (t->type != JSMN_OBJECT)
     {
@@ -2816,7 +2832,8 @@ json_SummaryInfo (Bit_Chain *restrict dat, Dwg_Data *restrict dwg,
           size1 = t->size;
           LOG_TRACE ("\n%s pos:%d [%d members]\n--------------------\n",
                      "SummaryInfo_Property", tokens->index, size);
-          _obj->props = calloc (size1, sizeof (Dwg_SummaryInfo_Property));
+          _obj->props = (Dwg_SummaryInfo_Property *)calloc (
+              size1, sizeof (Dwg_SummaryInfo_Property));
           _obj->num_props = size1;
           tokens->index++;
           for (int j = 0; j < size1; j++)
@@ -2888,7 +2905,7 @@ json_AppInfo (Bit_Chain *restrict dat, Dwg_Data *restrict dwg,
 {
   const char *section = "AppInfo";
   const jsmntok_t *t = &tokens->tokens[tokens->index];
-  struct Dwg_AppInfo *_obj = &dwg->appinfo;
+  Dwg_AppInfo *_obj = &dwg->appinfo;
   int size;
   if (t->type != JSMN_OBJECT)
     {
@@ -2940,7 +2957,7 @@ json_AppInfoHistory (Bit_Chain *restrict dat, Dwg_Data *restrict dwg,
 {
   const char *section = "AppInfoHistory";
   const jsmntok_t *t = &tokens->tokens[tokens->index];
-  struct Dwg_AppInfoHistory *_obj = &dwg->appinfohistory;
+  Dwg_AppInfoHistory *_obj = &dwg->appinfohistory;
   int size;
   if (t->type != JSMN_OBJECT)
     {
@@ -2981,11 +2998,12 @@ json_AppInfoHistory (Bit_Chain *restrict dat, Dwg_Data *restrict dwg,
 static int
 json_FileDepList_Files (Bit_Chain *restrict dat, Dwg_Data *restrict dwg,
                         jsmntokens_t *restrict tokens,
-                        struct Dwg_FileDepList *o, int size)
+                        Dwg_FileDepList *o, int size)
 {
   const char *section = "FileDepList_Files";
   const jsmntok_t *t = &tokens->tokens[tokens->index];
-  o->files = calloc (size, sizeof (Dwg_FileDepList_Files));
+  o->files
+      = (Dwg_FileDepList_Files *)calloc (size, sizeof (Dwg_FileDepList_Files));
   o->num_files = size;
   for (int j = 0; j < size; j++)
     {
@@ -3039,7 +3057,7 @@ json_FileDepList (Bit_Chain *restrict dat, Dwg_Data *restrict dwg,
 {
   int error = 0;
   const char *section = "FileDepList";
-  struct Dwg_FileDepList *_obj = &dwg->filedeplist;
+  Dwg_FileDepList *_obj = &dwg->filedeplist;
   const jsmntok_t *t = &tokens->tokens[tokens->index];
   int size;
 
@@ -3069,7 +3087,7 @@ json_FileDepList (Bit_Chain *restrict dat, Dwg_Data *restrict dwg,
           else
             {
               int size1 = t->size;
-              _obj->features = calloc (size1, sizeof (BITCODE_TV));
+              _obj->features = (BITCODE_TV *)calloc (size1, sizeof (BITCODE_TV));
               _obj->num_features = size1;
               tokens->index++;
               for (int j = 0; j < size1; j++)
@@ -3116,7 +3134,7 @@ json_Security (Bit_Chain *restrict dat, Dwg_Data *restrict dwg,
                jsmntokens_t *restrict tokens)
 {
   const char *section = "Security";
-  struct Dwg_Security *_obj = &dwg->security;
+  Dwg_Security *_obj = &dwg->security;
   const jsmntok_t *t = &tokens->tokens[tokens->index];
   int size;
   if (t->type != JSMN_OBJECT)
@@ -3166,7 +3184,7 @@ json_RevHistory (Bit_Chain *restrict dat, Dwg_Data *restrict dwg,
                  jsmntokens_t *restrict tokens)
 {
   const char *section = "RevHistory";
-  struct Dwg_RevHistory *_obj = &dwg->revhistory;
+  Dwg_RevHistory *_obj = &dwg->revhistory;
   const jsmntok_t *t = &tokens->tokens[tokens->index];
   int size;
   if (t->type != JSMN_OBJECT)
@@ -3211,7 +3229,7 @@ json_ObjFreeSpace (Bit_Chain *restrict dat, Dwg_Data *restrict dwg,
                    jsmntokens_t *restrict tokens)
 {
   const char *section = "ObjFreeSpace";
-  struct Dwg_ObjFreeSpace *_obj = &dwg->objfreespace;
+  Dwg_ObjFreeSpace *_obj = &dwg->objfreespace;
   const jsmntok_t *t = &tokens->tokens[tokens->index];
   int size;
   if (t->type != JSMN_OBJECT)
@@ -3265,7 +3283,7 @@ json_Template (Bit_Chain *restrict dat, Dwg_Data *restrict dwg,
                jsmntokens_t *restrict tokens)
 {
   const char *section = "Template";
-  struct Dwg_Template *_obj = &dwg->template;
+  Dwg_Template *_obj = &dwg->Template;
   const jsmntok_t *t = &tokens->tokens[tokens->index];
   int size;
   if (t->type != JSMN_OBJECT)
@@ -3311,7 +3329,7 @@ json_Template (Bit_Chain *restrict dat, Dwg_Data *restrict dwg,
 EXPORT int
 dwg_read_json (Bit_Chain *restrict dat, Dwg_Data *restrict dwg)
 {
-  struct Dwg_Header *obj = &dwg->header;
+  Dwg_Header *obj = &dwg->header;
   jsmn_parser parser;
   jsmntokens_t tokens;
   unsigned int i;
@@ -3352,7 +3370,7 @@ dwg_read_json (Bit_Chain *restrict dat, Dwg_Data *restrict dwg)
       return DWG_ERR_INVALIDDWG;
     }
   LOG_TRACE ("  num_tokens: %ld\n", tokens.num_tokens);
-  tokens.tokens = calloc (tokens.num_tokens + 1024, sizeof (jsmntok_t));
+  tokens.tokens = (jsmntok_t *)calloc (tokens.num_tokens + 1024, sizeof (jsmntok_t));
   if (!tokens.tokens)
     return DWG_ERR_OUTOFMEM;
 
