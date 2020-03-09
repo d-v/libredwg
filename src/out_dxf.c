@@ -27,6 +27,7 @@ BLOCK_RECORD. Add CLASSES for those.
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <locale.h>
 #include <assert.h>
 //#include <math.h>
 
@@ -2368,6 +2369,8 @@ dwg_write_dxf (Bit_Chain *restrict dat, Dwg_Data *restrict dwg)
   loglevel = dwg->opts & DWG_OPTS_LOGLEVEL;
   if (dat->from_version == R_INVALID)
     dat->from_version = dat->version;
+
+  setlocale (LC_NUMERIC, "C");
 
   VALUE_TV (PACKAGE_STRING, 999);
 
