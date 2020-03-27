@@ -364,7 +364,7 @@ static bool env_var_checked_p;
 #define REACTORS(code)                                                        \
   if (obj->tio.object->reactors)                                              \
     {                                                                         \
-      OVERFLOW_CHECK_LV (nam, obj->tio.object->num_reactors)                  \
+      OVERFLOW_CHECK_LV (num_reactors, obj->tio.object->num_reactors)         \
       SINCE (R_13)                                                            \
       {                                                                       \
         for (vcount = 0; vcount < (BITCODE_BL)obj->tio.object->num_reactors;  \
@@ -561,6 +561,10 @@ static bool env_var_checked_p;
   }                                                                           \
   RESET_VER
 
+#define START_OBJECT_HANDLE_STREAM                                            \
+  START_HANDLE_STREAM                                                         \
+  CONTROL_HANDLE_STREAM
+
 #define SECTION_STRING_STREAM                                                 \
   {                                                                           \
     Bit_Chain sav_dat = *dat;                                                 \
@@ -589,9 +593,10 @@ static bool env_var_checked_p;
       obj->was_bitsize_set = 1;                                               \
     }                                                                         \
   if (!obj->hdlpos) obj->hdlpos = bit_position (dat);                         \
-  if (dat->version >= R_2007 && bit_position (hdl_dat) > 0)                   \
+  if (bit_position (hdl_dat) > 0)                                             \
     obj_flush_hdlstream (obj, dat, hdl_dat);                                  \
-  *hdl_dat = *dat;                                                            \
+  hdl_dat->byte = dat->byte;                                                  \
+  hdl_dat->bit = dat->bit;                                                    \
   RESET_VER
 
 static void
@@ -607,8 +612,7 @@ obj_flush_hdlstream (Dwg_Object *restrict obj, Bit_Chain *restrict dat,
       // TODO optimize
       bit_write_B (dat, bit_read_B (hdl_dat));
     }
-  free (hdl_dat->chain);
-  hdl_dat->size = 0;
+  bit_chain_free (hdl_dat);
 }
 
 #if 0
@@ -683,21 +687,24 @@ EXPORT long dwg_add_##token (Dwg_Data * dwg)     \
     Dwg_Object_Entity *_ent = obj->tio.entity;                                \
     Dwg_Entity_##token *_obj = _ent->tio.token;                               \
     int error;                                                                \
-    Bit_Chain *hdl_dat = dat;                                                 \
+    Bit_Chain _hdl_dat = { 0 };                                               \
+    Bit_Chain *hdl_dat = &_hdl_dat; /* a new copy */                          \
     Bit_Chain *str_dat = dat; /* a ref */                                     \
     Dwg_Data *dwg = obj->parent;                                              \
-    LOG_INFO ("Encode entity " #token "\n")                                   \
-    SINCE (R_2007) {                                                          \
-      Bit_Chain _hdl_dat;                                                     \
-      hdl_dat = &_hdl_dat; /* a new copy */                                   \
-      bit_chain_init (hdl_dat, 128);                                          \
-    }                                                                         \
+    LOG_INFO ("Encode entity " #token "\n");                                  \
+    bit_chain_init (hdl_dat, 128);                                            \
     error = dwg_encode_entity (obj, dat, hdl_dat, str_dat);                   \
     if (error)                                                                \
-      return error;
+      {                                                                       \
+        if (hdl_dat->chain != dat->chain)                                     \
+          bit_chain_free (hdl_dat);                                           \
+        return error;                                                         \
+      }
 
 #define DWG_ENTITY_END                                                        \
-  return error;                                                               \
+    if (hdl_dat->chain != dat->chain)                                         \
+      bit_chain_free (hdl_dat);                                               \
+    return error;                                                             \
   }
 
 /** Returns -1 if not added, else returns the new objid.
@@ -710,26 +717,33 @@ EXPORT long dwg_add_##token (Dwg_Data * dwg)     \
   {                                                                           \
     BITCODE_BL vcount, rcount1, rcount2, rcount3, rcount4;                    \
     int error;                                                                \
-    Bit_Chain *hdl_dat = dat;                                                 \
-    Bit_Chain *str_dat = dat; /* a ref */                                     \
+    Bit_Chain _hdl_dat = { 0 };                                               \
+    Bit_Chain *hdl_dat = &_hdl_dat; /* a new copy */                          \
+    Bit_Chain *str_dat = dat;       /* a ref */                               \
     Dwg_Data *dwg = obj->parent;                                              \
-    Dwg_Object_##token *_obj = obj->tio.object ? obj->tio.object->tio.token : NULL; \
-    SINCE (R_2007) {                                                          \
-      Bit_Chain _hdl_dat;                                                     \
-      hdl_dat = &_hdl_dat; /* a new copy */                                   \
-      bit_chain_init (hdl_dat, 128);                                          \
-    }                                                                         \
+    Dwg_Object_##token *_obj                                                  \
+        = obj->tio.object ? obj->tio.object->tio.token : NULL;                \
+    LOG_INFO ("Encode object " #token "\n");                                  \
+    bit_chain_init (hdl_dat, 128);                                            \
     error = dwg_encode_object (obj, dat, hdl_dat, str_dat);                   \
     if (error)                                                                \
-      return error;                                                           \
-    LOG_INFO ("Encode object " #token "\n")
+      {                                                                       \
+        bit_chain_free (hdl_dat);                                             \
+        return error;                                                         \
+      }
 
+// some objects specs forgot about the common streams, so add it here
 #define DWG_OBJECT_END                                                        \
-  return error;                                                               \
+    if (!obj->hdlpos)                                                         \
+      {                                                                       \
+        START_OBJECT_HANDLE_STREAM                                            \
+      }                                                                       \
+    bit_chain_free (hdl_dat);                                                 \
+    return error;                                                             \
   }
 
 #define ENT_REACTORS(code)                                                    \
-  if (dat->version >= R_2000 && _obj->num_reactors > 0x1000)                  \
+  if (dat->version >= R_13 && _obj->num_reactors > 0x1000)                    \
     {                                                                         \
       LOG_ERROR ("Invalid num_reactors: %ld\n", (long)_obj->num_reactors);    \
       return DWG_ERR_VALUEOUTOFBOUNDS;                                        \
@@ -770,8 +784,8 @@ static int encode_preR13 (Dwg_Data *restrict dwg, Bit_Chain *restrict dat);
 
 static int dwg_encode_entity (Dwg_Object *restrict obj, Bit_Chain *dat,
                               Bit_Chain *hdl_dat, Bit_Chain *str_dat);
-static int dwg_encode_object (Dwg_Object *restrict obj, Bit_Chain *str_dat,
-                              Bit_Chain *hdl_dat, Bit_Chain *dat);
+static int dwg_encode_object (Dwg_Object *restrict obj, Bit_Chain *dat,
+                              Bit_Chain *restrict hdl_dat, Bit_Chain *str_dat);
 static int dwg_encode_common_entity_handle_data (Bit_Chain *dat,
                                                  Bit_Chain *hdl_dat,
                                                  Dwg_Object *restrict obj);
@@ -861,7 +875,7 @@ dwg_encode (Dwg_Data *restrict dwg, Bit_Chain *restrict dat)
   Bit_Chain *hdl_dat;
   const char *section_names[]
       = { "AcDb:Header", "AcDb:Classes", "AcDb:Handles",
-          "2NDHEADER",   "MEASUREMENT",  "AcDb:AuxHeader" };
+          "2NDHEADER",   "AcDb:Template",  "AcDb:AuxHeader" };
   Dwg_Version_Type orig_from_version = dat->from_version;
 
   if (dwg->opts)
@@ -878,7 +892,7 @@ dwg_encode (Dwg_Data *restrict dwg, Bit_Chain *restrict dat)
 #endif /* USE_TRACING */
 
   bit_chain_alloc (dat);
-  hdl_dat = dat;
+  hdl_dat = dat; // splitted later in objects/entities
 
   /*------------------------------------------------------------
    * Header
@@ -2627,6 +2641,7 @@ dwg_encode_common_entity_handle_data (Bit_Chain *dat, Bit_Chain *hdl_dat,
   return error;
 }
 
+
 void
 dwg_encode_handleref (Bit_Chain *hdl_dat, Dwg_Object *restrict obj,
                       Dwg_Data *restrict dwg, Dwg_Object_Ref *restrict ref)
@@ -2698,56 +2713,47 @@ dwg_encode_handleref_with_code (Bit_Chain *hdl_dat, Dwg_Object *restrict obj,
 
 /* The first common part of every object.
 
-   There is no COMMON_ENTITY_HANDLE_DATA for objects.
+   There is no COMMON_ENTITY_DATA for objects, handles are deferred and flushed later.
    See DWG_SUPERTYPE_OBJECT in dwg_encode().
 */
 static int
-dwg_encode_object (Dwg_Object *restrict obj, Bit_Chain *hdl_dat,
-                   Bit_Chain *str_dat, Bit_Chain *dat)
+dwg_encode_object (Dwg_Object *restrict obj, Bit_Chain *dat,
+                   Bit_Chain *restrict hdl_dat, Bit_Chain *str_dat)
 {
   int error = 0;
-  Dwg_Object_Object *ord = obj->tio.object;
+  BITCODE_BL vcount;
 
-  VERSIONS (R_2000, R_2007)
   {
-    obj->bitsize_pos = bit_position (dat);
-    bit_write_RL (dat, obj->bitsize);
-    LOG_INFO ("bitsize: " FORMAT_RL " [RL] (@%lu.%u)\n", obj->bitsize,
-              dat->byte - 4, dat->bit);
+    Dwg_Object *_obj = obj;
+    VERSIONS (R_2000, R_2007)
+    {
+      obj->bitsize_pos = bit_position (dat);
+      FIELD_RL (bitsize, 0);
+    }
+    obj->was_bitsize_set = 0;
+    if (obj->bitsize)
+      // the handle stream offset
+      obj->hdlpos = bit_position (dat) + obj->bitsize;
+    SINCE (R_2007) { obj_string_stream (dat, obj, str_dat); }
+    if (!_obj)
+      return DWG_ERR_INVALIDTYPE;
+
+    bit_write_H (dat, &obj->handle);
+    LOG_TRACE ("handle: " FORMAT_H " [H 5]\n", ARGS_H (obj->handle));
+    error |= dwg_encode_eed (dat, obj);
+
+    VERSIONS (R_13, R_14)
+    {
+      obj->bitsize_pos = bit_position (dat);
+      FIELD_RL (bitsize, 0);
+    }
   }
-  obj->was_bitsize_set = 0;
-  if (obj->bitsize)
-    // the handle stream offset
-    obj->hdlpos = bit_position (dat) + obj->bitsize;
-  SINCE (R_2007) { obj_string_stream (dat, obj, str_dat); }
-  if (!ord)
-    return DWG_ERR_INVALIDTYPE;
 
-  bit_write_H (dat, &obj->handle);
-  LOG_TRACE ("handle: " FORMAT_H " [H 5]\n", ARGS_H (obj->handle));
-  error |= dwg_encode_eed (dat, obj);
-
-  VERSIONS (R_13, R_14)
-  {
-    obj->bitsize_pos = bit_position (dat);
-    bit_write_RL (dat, obj->bitsize);
-    LOG_INFO ("bitsize: " FORMAT_RL " [RL] (@%lu.%u)\n", obj->bitsize,
-              dat->byte - 4, dat->bit);
-  }
-
-  bit_write_BL (dat, ord->num_reactors);
-  LOG_TRACE ("num_reactors: " FORMAT_BL " [BL]\n", ord->num_reactors);
-  SINCE (R_2004)
-  {
-    bit_write_B (dat, ord->xdic_missing_flag);
-    LOG_TRACE ("xdic_missing_flag: " FORMAT_B " [B]\n",
-               ord->xdic_missing_flag);
-  }
-  SINCE (R_2013)
-  {
-    bit_write_B (dat, ord->has_ds_binary_data);
-    LOG_TRACE ("has_ds_binary_data: " FORMAT_B " [B]\n",
-               ord->has_ds_binary_data);
+  SINCE (R_13) {
+    Dwg_Object_Object *_obj = obj->tio.object;
+    FIELD_BL (num_reactors, 0);
+    SINCE (R_2004) { FIELD_B (xdic_missing_flag, 0); }
+    SINCE (R_2013) { FIELD_B (has_ds_binary_data, 0); }
   }
   return error;
 }
